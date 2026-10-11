@@ -21,9 +21,18 @@
     const script = document.createElement("script");
     script.src = path + "?v=" + version;
     script.defer = true;
-    document.body.appendChild(script);
+    document.head.appendChild(script);
   }
 
-  cssFiles.forEach(appendCSS);
-  jsFiles.forEach(appendJS);
+  function loadAssets() {
+    cssFiles.forEach(appendCSS);
+    jsFiles.forEach(appendJS);
+  }
+
+  // Wait for document to be ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadAssets);
+  } else {
+    loadAssets();
+  }
 })();
