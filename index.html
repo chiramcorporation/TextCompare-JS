@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chiram | Text Compare</title>
+    <meta
+      name="description"
+      content="A premium enterprise text comparison tool for Chiram."
+    />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <script src="js/loader.js"></script>
+  </head>
+  <body>
+    <header class="top-banner">
+      <div class="container">
+        <div class="brand-row">
+          <div class="brand-mark" aria-label="Chiram logo">C</div>
+          <div class="brand-text">
+            <span class="brand-label">Enterprise</span>
+            <h1>Chiram</h1>
+          </div>
+          <div class="theme-toggle-wrapper">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+              <span class="toggle-icon" id="toggleIcon">🌙</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="compare-panel">
+        <div class="compare-grid">
+          <div class="editor-wrap">
+            <div class="editor-header">
+              <span>Original Text</span>
+              <span id="count1" class="meta-counter">0 chars / 0 words</span>
+            </div>
+            <textarea id="text1" placeholder="Paste or type your first text here..."></textarea>
+          </div>
+
+          <div class="editor-wrap">
+            <div class="editor-header">
+              <span>Compared Text</span>
+              <span id="count2" class="meta-counter">0 chars / 0 words</span>
+            </div>
+            <textarea id="text2" placeholder="Paste or type your second text here..."></textarea>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <small>Character Difference</small>
+            <strong id="charDiff">0</strong>
+          </div>
+          <div class="stat-card">
+            <small>Word Difference</small>
+            <strong id="wordDiff">0</strong>
+          </div>
+          <div class="stat-card">
+            <small>Similarity</small>
+            <strong id="similarity">0%</strong>
+          </div>
+          <div class="stat-card">
+            <small>Match</small>
+            <strong id="matchStatus">
+              <span class="status-badge status-different">Different</span>
+            </strong>
+          </div>
+        </div>
+
+        <div class="diff-section">
+          <div class="section-head">
+            <h2>Side-by-Side Difference</h2>
+          </div>
+          <div class="diff-grid">
+            <div class="diff-column">
+              <h3>Left Text</h3>
+              <div id="leftDiff" class="diff-box"></div>
+            </div>
+            <div class="diff-column">
+              <h3>Right Text</h3>
+              <div id="rightDiff" class="diff-box"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-strip">
+          <p id="resultMessage">Enter text in both fields to compare.</p>
+        </div>
+
+        <div class="action-row">
+          <button type="button" class="btn btn-primary" id="clearBtn">Clear All</button>
+          <button type="button" class="btn btn-secondary" id="swapBtn">Swap Texts</button>
+          <button type="button" class="btn btn-success" id="copyBtn">Copy Results</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2025 Chiram. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
