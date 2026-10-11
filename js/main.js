@@ -1,155 +1,526 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const text1 = document.getElementById("text1");
-  const text2 = document.getElementById("text2");
-  const count1 = document.getElementById("count1");
-  const count2 = document.getElementById("count2");
-  const charDiffEl = document.getElementById("charDiff");
-  const wordDiffEl = document.getElementById("wordDiff");
-  const similarityEl = document.getElementById("similarity");
-  const matchStatusEl = document.getElementById("matchStatus");
-  const resultMessageEl = document.getElementById("resultMessage");
-  const leftDiff = document.getElementById("leftDiff");
-  const rightDiff = document.getElementById("rightDiff");
+* {
+  box-sizing: border-box;
+}
 
-  function countWords(value) {
-    const trimmed = value.trim();
-    if (!trimmed) return 0;
-    return trimmed.split(/\s+/).length;
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-900);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: min(1280px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.top-banner {
+  background: linear-gradient(135deg, #0b0b0b 0%, #1a1a1a 100%);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.28);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+html.light-mode .top-banner {
+  background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 110px;
+  padding: 16px 0;
+  justify-content: space-between;
+}
+
+.brand-mark {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #111;
+  background: linear-gradient(135deg, var(--orange-soft), var(--orange));
+  box-shadow: 0 0 22px rgba(255, 138, 29, 0.38);
+  flex-shrink: 0;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.1;
+  flex: 1;
+}
+
+.brand-label {
+  color: var(--orange-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  margin-bottom: 4px;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  letter-spacing: 0.04em;
+}
+
+.theme-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.theme-toggle {
+  background: rgba(255, 138, 29, 0.12);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 1.4rem;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 138, 29, 0.2);
+  transform: scale(1.05);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.toggle-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.page-shell {
+  flex: 1;
+  padding: 32px 0 28px;
+}
+
+.compare-panel {
+  width: min(1280px, calc(100% - 28px));
+  margin: 0 auto;
+  background: linear-gradient(180deg, rgba(23,23,23,0.95), rgba(13,13,13,0.95));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 40px var(--shadow);
+  padding: 18px 18px 12px;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+html.light-mode .compare-panel {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(245,245,245,0.95));
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.editor-wrap {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 138, 29, 0.05);
+  color: var(--text);
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.meta-counter {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 360px;
+  resize: vertical;
+  border: none;
+  outline: none;
+  background: var(--surface);
+  color: var(--text);
+  padding: 18px;
+  font-size: 1rem;
+  line-height: 1.7;
+  font-family: inherit;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--orange);
+}
+
+.stat-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: clamp(1.2rem, 2vw, 2rem);
+  color: var(--orange-soft);
+  font-weight: 800;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.3s ease;
+}
+
+.status-same {
+  background: rgba(31, 170, 105, 0.14);
+  color: #86e7b1;
+  border: 1px solid rgba(31, 170, 105, 0.4);
+}
+
+html.light-mode .status-same {
+  background: rgba(31, 170, 105, 0.12);
+  color: #0d7d4a;
+  border: 1px solid rgba(31, 170, 105, 0.5);
+}
+
+.status-different {
+  background: rgba(231, 76, 76, 0.14);
+  color: #ff9a9a;
+  border: 1px solid rgba(231, 76, 76, 0.4);
+}
+
+html.light-mode .status-different {
+  background: rgba(231, 76, 76, 0.12);
+  color: #b41717;
+  border: 1px solid rgba(231, 76, 76, 0.5);
+}
+
+.diff-section {
+  margin-top: 26px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.section-head {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 138, 29, 0.04);
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  color: var(--orange-soft);
+}
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px;
+}
+
+.diff-column {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  min-height: 180px;
+  transition: all 0.3s ease;
+}
+
+.diff-column h3 {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.diff-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: flex-start;
+  min-height: 128px;
+  line-height: 1.8;
+}
+
+.token {
+  display: inline-block;
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transition: all 0.2s ease;
+}
+
+.token.equal {
+  background: rgba(255,138,29,0.12);
+  color: var(--text);
+}
+
+html.light-mode .token.equal {
+  background: rgba(255,138,29,0.15);
+  color: var(--text);
+}
+
+.token.added {
+  background: rgba(31,170,105,0.18);
+  color: #affad0;
+  border: 1px solid rgba(31,170,105,0.28);
+}
+
+html.light-mode .token.added {
+  background: rgba(31,170,105,0.12);
+  color: #0c7c4a;
+  border: 1px solid rgba(31,170,105,0.4);
+}
+
+.token.removed {
+  background: rgba(231,76,76,0.18);
+  color: #ffd2d2;
+  border: 1px solid rgba(231,76,76,0.28);
+  text-decoration: line-through;
+}
+
+html.light-mode .token.removed {
+  background: rgba(231,76,76,0.12);
+  color: #9d1d1d;
+  border: 1px solid rgba(231,76,76,0.38);
+}
+
+.token.changed {
+  background: rgba(255,138,29,0.18);
+  color: #ffd7a0;
+  border: 1px solid rgba(255,138,29,0.3);
+}
+
+html.light-mode .token.changed {
+  background: rgba(255,138,29,0.12);
+  color: #8d5100;
+  border: 1px solid rgba(255,138,29,0.35);
+}
+
+.token.empty {
+  background: transparent;
+}
+
+.result-strip {
+  margin-top: 22px;
+  border: 1px solid var(--border);
+  background: rgba(255, 138, 29, 0.04);
+  border-radius: 12px;
+  padding: 16px 18px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.result-strip p {
+  margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.action-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, opacity 0.18s ease, background-color 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: var(--orange);
+  color: #111;
+}
+
+.btn-primary:hover {
+  background: var(--orange-soft);
+}
+
+.btn-secondary {
+  background: #1f1f1f;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+html.light-mode .btn-secondary {
+  background: #f0f0f0;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: #2a2a2a;
+}
+
+html.light-mode .btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+
+.btn-success:hover {
+  background: #158251;
+}
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  background: rgba(17,17,17,0.9);
+  padding: 18px 0 26px;
+  transition: all 0.3s ease;
+}
+
+html.light-mode .site-footer {
+  background: rgba(245,245,245,0.9);
+}
+
+.site-footer p {
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+}
+
+@media (max-width: 820px) {
+  .compare-grid,
+  .diff-grid,
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
-  function tokenize(value) {
-    return value.split(/(\s+)/).filter(Boolean);
+  .compare-panel {
+    width: min(100%, calc(100% - 18px));
   }
 
-  function buildDiffTokens(leftText, rightText) {
-    const leftTokens = tokenize(leftText);
-    const rightTokens = tokenize(rightText);
-
-    const maxLength = Math.max(leftTokens.length, rightTokens.length);
-
-    const leftResult = [];
-    const rightResult = [];
-
-    for (let i = 0; i < maxLength; i++) {
-      const leftToken = leftTokens[i] || "";
-      const rightToken = rightTokens[i] || "";
-
-      const isSame = leftToken === rightToken;
-
-      leftResult.push({
-        value: leftToken,
-        className: isSame ? "token equal" : (leftToken ? "token changed" : "token empty")
-      });
-
-      rightResult.push({
-        value: rightToken,
-        className: isSame ? "token equal" : (rightToken ? "token changed" : "token empty")
-      });
-    }
-
-    return { leftResult, rightResult };
+  .action-row {
+    flex-direction: column;
   }
 
-  function renderDiff(leftText, rightText) {
-    const { leftResult, rightResult } = buildDiffTokens(leftText, rightText);
-
-    leftDiff.innerHTML = "";
-    rightDiff.innerHTML = "";
-
-    leftResult.forEach((token) => {
-      const span = document.createElement("span");
-      span.className = token.className;
-      span.textContent = token.value || " ";
-      leftDiff.appendChild(span);
-    });
-
-    rightResult.forEach((token) => {
-      const span = document.createElement("span");
-      span.className = token.className;
-      span.textContent = token.value || " ";
-      rightDiff.appendChild(span);
-    });
+  .btn {
+    width: 100%;
   }
 
-  function compareTexts() {
-    const leftValue = text1.value;
-    const rightValue = text2.value;
-
-    const leftWords = tokenize(leftValue);
-    const rightWords = tokenize(rightValue);
-
-    const charDiff = Math.abs(leftValue.length - rightValue.length);
-    const wordDiff = Math.abs(leftWords.length - rightWords.length);
-
-    let sameCount = 0;
-    const total = Math.max(leftWords.length, rightWords.length, 1);
-
-    for (let i = 0; i < Math.min(leftWords.length, rightWords.length); i++) {
-      if (leftWords[i] === rightWords[i]) sameCount++;
-    }
-
-    const similarity = Math.round((sameCount / total) * 100);
-
-    count1.textContent = `${leftValue.length} chars / ${countWords(leftValue)} words`;
-    count2.textContent = `${rightValue.length} chars / ${countWords(rightValue)} words`;
-    charDiffEl.textContent = charDiff;
-    wordDiffEl.textContent = wordDiff;
-    similarityEl.textContent = similarity + "%";
-
-    renderDiff(leftValue, rightValue);
-
-    if (!leftValue.trim() && !rightValue.trim()) {
-      matchStatusEl.innerHTML = '<span class="status-badge status-different">No Input</span>';
-      resultMessageEl.textContent = "Enter text in both fields to compare.";
-      return;
-    }
-
-    if (leftValue.trim() === rightValue.trim()) {
-      matchStatusEl.innerHTML = '<span class="status-badge status-same">Match</span>';
-      resultMessageEl.textContent = "Both texts are exactly the same.";
-      return;
-    }
-
-    matchStatusEl.innerHTML = '<span class="status-badge status-different">Different</span>';
-    resultMessageEl.textContent = "The texts are not identical. Similarity score: " + similarity + "%.";
+  .brand-row {
+    gap: 12px;
   }
 
-  function clearAll() {
-    text1.value = "";
-    text2.value = "";
-    compareTexts();
+  .brand-text h1 {
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-row {
+    gap: 10px;
   }
 
-  function swapTexts() {
-    const temp = text1.value;
-    text1.value = text2.value;
-    text2.value = temp;
-    compareTexts();
+  .brand-mark {
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
   }
 
-  async function copyResults() {
-    const resultText = [
-      "Text Comparison Results",
-      "Character Difference: " + charDiffEl.textContent,
-      "Word Difference: " + wordDiffEl.textContent,
-      "Similarity: " + similarityEl.textContent,
-      "Match: " + matchStatusEl.textContent.trim()
-    ].join("\n");
-
-    try {
-      await navigator.clipboard.writeText(resultText);
-      alert("Comparison results copied to clipboard.");
-    } catch (error) {
-      alert("Copy failed. Please try again.");
-    }
+  .brand-label {
+    font-size: 0.6rem;
   }
 
-  text1.addEventListener("input", compareTexts);
-  text2.addEventListener("input", compareTexts);
+  .brand-text h1 {
+    font-size: 1.2rem;
+  }
 
-  document.getElementById("clearBtn").addEventListener("click", clearAll);
-  document.getElementById("swapBtn").addEventListener("click", swapTexts);
-  document.getElementById("copyBtn").addEventListener("click", copyResults);
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+  }
+}
 
-  compareTexts();
-});
